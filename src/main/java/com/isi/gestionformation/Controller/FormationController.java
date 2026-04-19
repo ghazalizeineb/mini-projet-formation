@@ -1,5 +1,6 @@
 package com.isi.gestionformation.Controller;
 
+import com.isi.gestionformation.dto.FormationDTO;
 import com.isi.gestionformation.model.Formation;
 import com.isi.gestionformation.Service.FormationService;
 import lombok.RequiredArgsConstructor;
@@ -37,13 +38,13 @@ public class FormationController {
     }
 
     @PostMapping
-    public ResponseEntity<Formation> create(@RequestBody Formation formation) {
-        return new ResponseEntity<>(formationService.create(formation), HttpStatus.CREATED);
+    public ResponseEntity<Formation> create(@RequestBody FormationDTO dto) {
+        return new ResponseEntity<>(formationService.create(dto), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Formation> update(@PathVariable Long id, @RequestBody Formation formation) {
-        return ResponseEntity.ok(formationService.update(id, formation));
+    public ResponseEntity<Formation> update(@PathVariable Long id, @RequestBody FormationDTO dto) {
+        return ResponseEntity.ok(formationService.update(id, dto));
     }
 
     @PostMapping("/{formationId}/participants/{participantId}")
