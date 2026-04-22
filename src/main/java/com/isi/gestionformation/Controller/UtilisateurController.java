@@ -12,6 +12,7 @@ import java.util.List;
 @RequestMapping("/api/utilisateurs")
 @RequiredArgsConstructor
 public class UtilisateurController {
+
     private final UtilisateurService utilisateurService;
 
     @GetMapping
@@ -22,8 +23,8 @@ public class UtilisateurController {
     @GetMapping("/{id}")
     public ResponseEntity<Utilisateur> getById(@PathVariable Long id) {
         return utilisateurService.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
@@ -36,12 +37,21 @@ public class UtilisateurController {
         return ResponseEntity.ok(utilisateurService.update(id, utilisateur));
     }
 
+    // ← endpoint lier participant
+    @PutMapping("/{id}/participant/{participantId}")
+    public ResponseEntity<Utilisateur> lierParticipant(
+            @PathVariable Long id,
+            @PathVariable Long participantId) {
+        return ResponseEntity.ok(utilisateurService.lierParticipant(id, participantId));
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         utilisateurService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
+    // ← méthode count ajoutée
     @GetMapping("/count")
     public ResponseEntity<Long> count() {
         return ResponseEntity.ok(utilisateurService.count());

@@ -22,4 +22,8 @@ public class Utilisateur {
     @ManyToOne
     @JoinColumn(name = "id_role", nullable = false)
     private Role role;
+
+    @OneToOne
+    @JoinColumn(name = "id_participant", nullable = true)
+    private Participant participant; // lié au participant si rôle = SIMPLE_UTILISATEUR
 }

@@ -1,6 +1,8 @@
 package com.isi.gestionformation.Service;
 
+import com.isi.gestionformation.model.Participant;
 import com.isi.gestionformation.model.Utilisateur;
+import com.isi.gestionformation.Repository.ParticipantRepository;
 import com.isi.gestionformation.Repository.UtilisateurRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,22 +15,29 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Transactional
 public class UtilisateurService {
+
     private final UtilisateurRepository utilisateurRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ParticipantRepository participantRepository; // ← ajouté
 
     @Transactional(readOnly = true)
-    public List<Utilisateur> findAll() { return utilisateurRepository.findAll(); }
+    public List<Utilisateur> findAll() {
+        return utilisateurRepository.findAll();
+    }
 
     @Transactional(readOnly = true)
-    public Optional<Utilisateur> findById(Long id) { return utilisateurRepository.findById(id); }
+    public Optional<Utilisateur> findById(Long id) {
+        return utilisateurRepository.findById(id);
+    }
 
     @Transactional(readOnly = true)
-    public Optional<Utilisateur> findByLogin(String login) { return utilisateurRepository.findByLogin(login); }
+    public Optional<Utilisateur> findByLogin(String login) {
+        return utilisateurRepository.findByLogin(login);
+    }
 
     public Utilisateur create(Utilisateur utilisateur) {
-        if (utilisateurRepository.existsByLogin(utilisateur.getLogin())) {
+        if (utilisateurRepository.existsByLogin(utilisateur.getLogin()))
             throw new RuntimeException("Login déjà utilisé : " + utilisateur.getLogin());
-        }
         utilisateur.setPassword(passwordEncoder.encode(utilisateur.getPassword()));
         return utilisateurRepository.save(utilisateur);
     }
@@ -38,10 +47,19 @@ public class UtilisateurService {
             .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé : " + id));
         utilisateur.setLogin(utilisateurModifie.getLogin());
         utilisateur.setRole(utilisateurModifie.getRole());
-        if (utilisateurModifie.getPassword() != null && !utilisateurModifie.getPassword().isBlank()) {
+        if (utilisateurModifie.getPassword() != null && !utilisateurModifie.getPassword().isBlank())
             utilisateur.setPassword(passwordEncoder.encode(utilisateurModifie.getPassword()));
-        }
         return utilisateurRepository.save(utilisateur);
+    }
+
+    // ← méthode ajoutée pour lier un participant
+    public Utilisateur lierParticipant(Long userId, Long participantId) {
+        Utilisateur user = utilisateurRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé : " + userId));
+        Participant participant = participantRepository.findById(participantId)
+            .orElseThrow(() -> new RuntimeException("Participant non trouvé : " + participantId));
+        user.setParticipant(participant);
+        return utilisateurRepository.save(user);
     }
 
     public void delete(Long id) {
@@ -50,6 +68,9 @@ public class UtilisateurService {
         utilisateurRepository.deleteById(id);
     }
 
+    // ← méthode count ajoutée
     @Transactional(readOnly = true)
-    public long count() { return utilisateurRepository.count(); }
-}
+    public long count() {
+        return utilisateurRepository.count();
+    }
+}   
